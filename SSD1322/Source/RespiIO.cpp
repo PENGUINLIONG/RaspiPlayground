@@ -3,6 +3,7 @@
 #include <memory>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
 #include "../Include/RespiIO.hpp"
 
 /*
@@ -76,7 +77,7 @@ namespace LiongStudio
 				PROT_READ | PROT_WRITE, /* Enable reading & writting to mapped memory */
 				MAP_SHARED, /* Shared with other processes */
 				mem_fd, /* File to map */
-				(unsigned int*)BCM2835_GPIO_BASE /* Offset to GPIO peripheral */
+				(off_t)BCM2835_GPIO_BASE /* Offset to GPIO peripheral */
 				);
 
 			close(mem_fd);

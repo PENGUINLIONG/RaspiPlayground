@@ -16,5 +16,5 @@ int main()
 	SSD1322 dev(info, 256, 64);
 	dev.FillScreen(1 << 3);
 	dev.Flush();
-	std::this_thread::sleep_for(10000ms);
+	std::this_thread::sleep_for(100000ms);
 }
