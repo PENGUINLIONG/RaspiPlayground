@@ -179,7 +179,7 @@ namespace LiongStudio
 				SendCommand(SSD1322_EXITPARTIALDISPLAY); // 0xA9 
 				
 				// Clear down image ram before opening display 
-				FillScreen(0x00);
+				FillScreen(0xFF);
 
 				SendCommand(SSD1322_DISPLAYON); // 0xAF 
 			}

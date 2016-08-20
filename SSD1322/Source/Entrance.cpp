@@ -12,12 +12,14 @@ int main()
 	std::cout << "App started!" << std::endl;
 	SSD1322Info info;
 	info.Channel = 0;
-	info.ResetPinId = 17;
-	info.DcPinId = 27;
+	info.ResetPinId = 11;
+	info.DcPinId = 13;
 	info.MaxClock = 1000000;
 	std::cout << "Configuration finished! Trying to create instance." << std::endl;
 	SSD1322 dev(info, 256, 64);
-	dev.FillScreen(1 << 3);
-	std::cout << "Waiting for 100s to quit...";
+	std::cout << "Printing result..." << std::endl;
+	dev.FillScreen(0xFF);
+	std::cout << "Waiting for 100s to quit..." << std::endl;
 	std::this_thread::sleep_for(100000ms);
+	return 0;
 }
