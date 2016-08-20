@@ -97,21 +97,28 @@ namespace LiongStudio
 
 			void SSD1322::SendCommand(unsigned char cmd)
 			{
+				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
 				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::Low);
+				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::Low);
 				_Spi->Transmit(&cmd, nullptr, 1);
+				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
 			}
 
 			void SSD1322::SendData(unsigned char data)
 			{
+				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
 				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::High);
+				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::Low);
 				_Spi->Transmit(&data, nullptr, 1);
-				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::Low);
+				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
 			}
 			void SSD1322::SendData(unsigned char* field, int length)
 			{
+				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
 				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::High);
+				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::Low);
 				_Spi->Transmit(field, nullptr, length);
-				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::Low);
+				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
 			}
 
 			// Private
@@ -148,9 +155,6 @@ namespace LiongStudio
 				SendCommand(SSD1322_DISPLAYENHANCE); // 0xB4 
 				SendData(0xA0); // enables the external VSL 
 				SendData(0xFD); // 0xfFD,Enhanced low GS display quality;default is 0xb5(normal), 
-
-				SendCommand(SSD1322_SETCONTRASTCURRENT); // 0xC1 
-				SendData(0xFF); // 0xFF - default is 0x7f 
 
 				SendCommand(SSD1322_MASTERCURRENTCONTROL); // 0xC7 
 				SendData(0x0F); // default is 0x0F 

@@ -51,6 +51,7 @@ namespace LiongStudio
 				int Channel = 0;
 				int ResetPinId = 0;
 				int DcPinId = 0;
+				int CsPinId = 0;
 				int MaxClock = 0;
 			};
 
