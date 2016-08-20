@@ -7,7 +7,7 @@ using namespace LiongStudio::RaspiPlayground;
 using namespace LiongStudio::RaspiPlayground::Devices;
 using namespace std::chrono_literals;
 
-void main()
+int main()
 {
 	std::cout << "App started!" << std::endl;
 	SSD1322Info info;
