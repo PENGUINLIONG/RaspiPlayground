@@ -71,14 +71,14 @@ namespace LiongStudio
 			if ((mem_fd = open("/dev/mem", O_RDWR | O_SYNC)) < 0) throw std::runtime_error("Unable to open /dev/mem.");
 
 			/* mmap GPIO */
-			gpio_map = mmap(
+			gpio_map = reinterpret_cast<unsigned int*>(mmap(
 				nullptr, /* Any adddress in our space will do */
 				BLOCK_SIZE, /* Map length */
 				PROT_READ | PROT_WRITE, /* Enable reading & writting to mapped memory */
 				MAP_SHARED, /* Shared with other processes */
 				mem_fd, /* File to map */
 				(off_t)BCM2835_GPIO_BASE /* Offset to GPIO peripheral */
-				);
+			));
 
 			close(mem_fd);
 
