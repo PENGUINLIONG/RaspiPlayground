@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "RespiIO.hpp"
+#include "RaspiIO.hpp"
 
 #define SSD1322_LCDWIDTH 256 
 #define SSD1322_LCDHEIGHT 64

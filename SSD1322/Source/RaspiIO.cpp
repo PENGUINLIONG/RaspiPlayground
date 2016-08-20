@@ -4,7 +4,7 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include "../Include/RespiIO.hpp"
+#include "../Include/RaspiIO.hpp"
 
 /*
 *  GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x) or SET_GPIO_ALT(x,y)
