@@ -46,21 +46,12 @@ namespace LiongStudio
 		{
 			using std::swap;
 
-			// Vcc for voltage in circuit.
-			enum class VccState
-			{
-				None = 0,
-				External = 1,
-				SwitchCap = 2
-			};
-
 			struct SSD1322Info
 			{
 				int Channel = 0;
 				int ResetPinId = 0;
 				int DcPinId = 0;
 				int MaxClock = 0;
-				VccState VccState = VccState::None;
 			};
 
 			class SSD1322

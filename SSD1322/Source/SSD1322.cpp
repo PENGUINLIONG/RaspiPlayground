@@ -19,6 +19,7 @@ namespace LiongStudio
 				_Spi->SetPinVoltage(_Info.ResetPinId, Spi::PinVoltage::High);
 				_Spi->SetPinMode(_Info.DcPinId, Spi::PinMode::Output);
 				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::Low);
+				Launch();
 			}
 			SSD1322::SSD1322(SSD1322&& instance)
 				: _Info()

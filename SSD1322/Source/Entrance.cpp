@@ -10,7 +10,6 @@ int main()
 	info.ResetPinId = 17;
 	info.DcPinId = 27;
 	info.MaxClock = 1000000;
-	info.VccState = VccState::External;
 	SSD1322 dev(info, 256, 64);
 	dev.FillScreen(1 << 3);
 }
