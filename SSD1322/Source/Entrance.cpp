@@ -1,7 +1,10 @@
 #include "../Include/SSD1322.hpp"
+#include <thread>
+#include <chrono>
 
 using namespace LiongStudio::RaspiPlayground;
 using namespace LiongStudio::RaspiPlayground::Devices;
+using namespace std::chrono_literals;
 
 int main()
 {
@@ -12,4 +15,6 @@ int main()
 	info.MaxClock = 1000000;
 	SSD1322 dev(info, 256, 64);
 	dev.FillScreen(1 << 3);
+	dev.Flush();
+	std::this_thread::sleep_for(10000ms);
 }

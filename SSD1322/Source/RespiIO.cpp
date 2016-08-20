@@ -30,39 +30,6 @@ namespace LiongStudio
 		const auto BCM2835_GPIO_BASE = (BCM2835_PERI_BASE + 0x200000); /* GPIO controller */
 		const auto BCM2835_SPI_BASE = (BCM2835_PERI_BASE + 0x204000); /* SPI controller */
 
-		const auto BCM2835_GPFSEL0 = *(gpio);
-		const auto BCM2835_GPFSEL1 = *(gpio + 1);
-		const auto BCM2835_GPFSEL2 = *(gpio + 2);
-
-		const auto BCM2835_SPICS = *(spi + 0);
-		const auto BCM2835_SPIFIFO = *(spi + 1);
-		const auto BCM2835_SPICLK = *(spi + 2);
-
-		const auto SPI_CS_LEN_LONG = 0x02000000;
-		const auto SPI_CS_DMA_LEN = 0x01000000;
-		const auto SPI_CS_CSPOL2 = 0x00800000;
-		const auto SPI_CS_CSPOL1 = 0x00400000;
-		const auto SPI_CS_CSPOL0 = 0x00200000;
-		const auto SPI_CS_RXF = 0x00100000;
-		const auto SPI_CS_RXR = 0x00080000;
-		const auto SPI_CS_TXD = 0x00040000;
-		const auto SPI_CS_RXD = 0x00020000;
-		const auto SPI_CS_DONE = 0x00010000;
-		const auto SPI_CS_LEN = 0x00002000;
-		const auto SPI_CS_REN = 0x00001000;
-		const auto SPI_CS_ADCS = 0x00000800;
-		const auto SPI_CS_INTR = 0x00000400;
-		const auto SPI_CS_INTD = 0x00000200;
-		const auto SPI_CS_DMAEN = 0x00000100;
-		const auto SPI_CS_TA = 0x00000080;
-		const auto SPI_CS_CSPOL = 0x00000040;
-		const auto SPI_CS_CLEAR_RX = 0x00000020;
-		const auto SPI_CS_CLEAR_TX = 0x00000010;
-		const auto SPI_CS_CPOL = 0x00000008;
-		const auto SPI_CS_CPHA = 0x00000004;
-		const auto SPI_CS_CS_10 = 0x00000002;
-		const auto SPI_CS_CS_01 = 0x00000001;
-
 		const auto BLOCK_SIZE = (4 * 1024);
 
 		volatile unsigned int* Spi::_Gpio = nullptr;
@@ -109,7 +76,7 @@ namespace LiongStudio
 				PROT_READ | PROT_WRITE, /* Enable reading & writting to mapped memory */
 				MAP_SHARED, /* Shared with other processes */
 				mem_fd, /* File to map */
-				BCM2835_GPIO_BASE /* Offset to GPIO peripheral */
+				(unsigned int*)BCM2835_GPIO_BASE /* Offset to GPIO peripheral */
 				);
 
 			close(mem_fd);
