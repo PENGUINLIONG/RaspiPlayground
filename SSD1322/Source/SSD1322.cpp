@@ -47,7 +47,7 @@ namespace LiongStudio
 
 				SendCommand(SSD1322_SETROWADDR);
 				SendData(0);
-				SendData(63);
+				SendData(0x7F);
 
 				SendCommand(SSD1322_WRITERAM);
 				SendData(_Bitmap, _Width * _Height / 2);
@@ -63,13 +63,13 @@ namespace LiongStudio
 
 				SendCommand(SSD1322_SETROWADDR);
 				SendData(0);
-				SendData(63);
+				SendData(0x7F);
 
 				color = (color & 0x0F) | (color << 4);
 
 				SendCommand(SSD1322_WRITERAM);
 
-				for (y = 0; y < 64; y++)
+				for (y = 0; y < 128; y++)
 				{
 					for (x = 0; x < 64; x++)
 					{
@@ -156,6 +156,9 @@ namespace LiongStudio
 				SendData(0xA0); // enables the external VSL 
 				SendData(0xFD); // 0xfFD,Enhanced low GS display quality;default is 0xb5(normal), 
 
+				SendCommand(SSD1322_SETCONTRASTCURRENT); // 0xC1 
+				SendData(0xFF); // 0xFF - default is 0x7f 
+
 				SendCommand(SSD1322_MASTERCURRENTCONTROL); // 0xC7 
 				SendData(0x0F); // default is 0x0F 
 
@@ -183,7 +186,7 @@ namespace LiongStudio
 				SendCommand(SSD1322_EXITPARTIALDISPLAY); // 0xA9 
 				
 				// Clear down image ram before opening display 
-				FillScreen(0xFF);
+				FillScreen(0x7F);
 
 				SendCommand(SSD1322_DISPLAYON); // 0xAF 
 			}

@@ -22,11 +22,6 @@ namespace LiongStudio
 {
 	namespace RaspiPlayground
 	{
-		const auto SPICLKDIV = 32;              /* ~8 Mhz */
-
-		const auto SPIBUFSIZE = 32;              /* SPI buffer size */
-		const auto BUFSIZE(SPIBUFSIZE / 4);
-
 		const auto BCM2835_PERI_BASE = 0x20000000;
 		const auto BCM2835_GPIO_BASE = (BCM2835_PERI_BASE + 0x200000); /* GPIO controller */
 		const auto BCM2835_SPI_BASE = (BCM2835_PERI_BASE + 0x204000); /* SPI controller */

@@ -34,8 +34,8 @@
 #define SSD1322_EXITPARTIALDISPLAY 0xA9
 #define SSD1322_SELECTDEFAULTGRAYSCALE 0xB9
 
-#define MIN_SEG	0x1C
-#define MAX_SEG	0x5B
+#define MIN_SEG	0x0
+#define MAX_SEG	0x77
 
 
 namespace LiongStudio
