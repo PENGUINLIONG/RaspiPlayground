@@ -42,10 +42,9 @@ int main()
 
 	dev.SendCommand(0xA5);
 	std::this_thread::sleep_for(10000ms);
-
+	dev.SendCommand(0xA4);
 	std::cout << "Printing result..." << std::endl;
 	printPattern(dev);
-	std::cout << "Waiting for 10s to quit..." << std::endl;
 	std::this_thread::sleep_for(10000ms);
 	dev.SendCommand(SSD1322_DISPLAYOFF);
 	return 0;

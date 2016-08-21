@@ -1,10 +1,12 @@
 #include "../Include/SSD1322.hpp"
 #include <thread>
 #include <chrono>
+#include <iostream>
 
 #define _L_MAKE_RV bool rv = false
 #define _L_CHECK rv |= !
 #define _L_RETURN_ERR return !rv
+#define _L_LOG_RV std::cout << rv << ' '
 
 namespace LiongStudio
 {
@@ -45,19 +47,27 @@ namespace LiongStudio
 
 			bool SSD1322::Flush()
 			{
-				_L_MAKERV;
+				_L_MAKE_RV;
 
 				_L_CHECK SendCommand(SSD1322_SETCOLUMNADDR);
+				_L_LOG_RV;
 				_L_CHECK SendData(MIN_SEG);
+				_L_LOG_RV;
 				_L_CHECK SendData(MAX_SEG);
+				_L_LOG_RV;
 
 				_L_CHECK SendCommand(SSD1322_SETROWADDR);
+				_L_LOG_RV;
 				_L_CHECK SendData(0);
+				_L_LOG_RV;
 				_L_CHECK SendData(0x7F);
+				_L_LOG_RV;
 
 				_L_CHECK SendCommand(SSD1322_WRITERAM);
+				_L_LOG_RV;
 				_L_CHECK SendData(_Bitmap, _Width * _Height / 2);
-
+				_L_LOG_RV;
+				
 				_L_RETURN_ERR;
 			}
 
@@ -66,16 +76,23 @@ namespace LiongStudio
 				_L_MAKE_RV;
 
 				_L_CHECK SendCommand(SSD1322_SETCOLUMNADDR);
+				_L_LOG_RV;
 				_L_CHECK SendData(MIN_SEG);
+				_L_LOG_RV;
 				_L_CHECK SendData(MAX_SEG);
+				_L_LOG_RV;
 
 				_L_CHECK SendCommand(SSD1322_SETROWADDR);
+				_L_LOG_RV;
 				_L_CHECK SendData(0);
+				_L_LOG_RV;
 				_L_CHECK SendData(0x7F);
+				_L_LOG_RV;
 
 				color = (color & 0x0F) | (color << 4);
 
 				_L_CHECK SendCommand(SSD1322_WRITERAM);
+				_L_LOG_RV;
 
 				for (int y = 0; y < 128; y++)
 				{
@@ -85,7 +102,7 @@ namespace LiongStudio
 						_L_CHECK SendData(color);
 					}
 				}
-				
+
 				_L_RETURN_ERR;
 			}
 
