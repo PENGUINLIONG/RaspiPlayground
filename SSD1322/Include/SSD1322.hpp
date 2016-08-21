@@ -81,13 +81,13 @@ namespace LiongStudio
 				SSD1322(SSD1322&& instance);
 				~SSD1322();
 
-				void Flush();
-				void FillScreen(unsigned char color);
+				bool Flush();
+				bool FillScreen(unsigned char color);
 				void GetBitmap(unsigned char*& bitmap, int& width, int& height);
 				void Reset();
-				void SendCommand(unsigned char cmd);
-				void SendData(unsigned char data);
-				void SendData(unsigned char* field, int length);
+				bool SendCommand(unsigned char cmd);
+				bool SendData(unsigned char data);
+				bool SendData(unsigned char* field, int length);
 			};
 		}
 	}

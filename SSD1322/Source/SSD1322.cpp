@@ -2,6 +2,10 @@
 #include <thread>
 #include <chrono>
 
+#define _L_MAKE_RV bool rv = false
+#define _L_CHECK rv |= !
+#define _L_RETURN_ERR return !rv
+
 namespace LiongStudio
 {
 	namespace RaspiPlayground
@@ -39,44 +43,50 @@ namespace LiongStudio
 				}
 			}
 
-			void SSD1322::Flush()
+			bool SSD1322::Flush()
 			{
-				SendCommand(SSD1322_SETCOLUMNADDR);
-				SendData(MIN_SEG);
-				SendData(MAX_SEG);
+				_L_MAKERV;
 
-				SendCommand(SSD1322_SETROWADDR);
-				SendData(0);
-				SendData(0x7F);
+				_L_CHECK SendCommand(SSD1322_SETCOLUMNADDR);
+				_L_CHECK SendData(MIN_SEG);
+				_L_CHECK SendData(MAX_SEG);
 
-				SendCommand(SSD1322_WRITERAM);
-				SendData(_Bitmap, _Width * _Height / 2);
+				_L_CHECK SendCommand(SSD1322_SETROWADDR);
+				_L_CHECK SendData(0);
+				_L_CHECK SendData(0x7F);
+
+				_L_CHECK SendCommand(SSD1322_WRITERAM);
+				_L_CHECK SendData(_Bitmap, _Width * _Height / 2);
+
+				_L_RETURN_ERR;
 			}
 
-			void SSD1322::FillScreen(unsigned char color)
+			bool SSD1322::FillScreen(unsigned char color)
 			{
-				uint8_t x, y;
+				_L_MAKE_RV;
 
-				SendCommand(SSD1322_SETCOLUMNADDR);
-				SendData(MIN_SEG);
-				SendData(MAX_SEG);
+				_L_CHECK SendCommand(SSD1322_SETCOLUMNADDR);
+				_L_CHECK SendData(MIN_SEG);
+				_L_CHECK SendData(MAX_SEG);
 
-				SendCommand(SSD1322_SETROWADDR);
-				SendData(0);
-				SendData(0x7F);
+				_L_CHECK SendCommand(SSD1322_SETROWADDR);
+				_L_CHECK SendData(0);
+				_L_CHECK SendData(0x7F);
 
 				color = (color & 0x0F) | (color << 4);
 
-				SendCommand(SSD1322_WRITERAM);
+				_L_CHECK SendCommand(SSD1322_WRITERAM);
 
-				for (y = 0; y < 128; y++)
+				for (int y = 0; y < 128; y++)
 				{
-					for (x = 0; x < 64; x++)
+					for (int x = 0; x < 64; x++)
 					{
-						SendData(color);
-						SendData(color);
+						_L_CHECK SendData(color);
+						_L_CHECK SendData(color);
 					}
 				}
+				
+				_L_RETURN_ERR;
 			}
 
 			void SSD1322::GetBitmap(unsigned char*& bitmap, int& width, int& height)
@@ -95,30 +105,33 @@ namespace LiongStudio
 				_Spi->SetPinVoltage(_Info.ResetPinId, Spi::PinVoltage::High);
 			}
 
-			void SSD1322::SendCommand(unsigned char cmd)
+			bool SSD1322::SendCommand(unsigned char cmd)
 			{
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
 				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::Low);
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::Low);
-				_Spi->Transmit(&cmd, nullptr, 1);
+				bool rv = _Spi->Transmit(&cmd, nullptr, 1) < 0;
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
+				return rv;
 			}
 
-			void SSD1322::SendData(unsigned char data)
+			bool SSD1322::SendData(unsigned char data)
 			{
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
 				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::High);
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::Low);
-				_Spi->Transmit(&data, nullptr, 1);
+				bool rv = _Spi->Transmit(&data, nullptr, 1) < 0;
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
+				return rv;
 			}
-			void SSD1322::SendData(unsigned char* field, int length)
+			bool SSD1322::SendData(unsigned char* field, int length)
 			{
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
 				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::High);
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::Low);
-				_Spi->Transmit(field, nullptr, length);
+				bool rv = _Spi->Transmit(field, nullptr, length) < 0;
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
+				return rv;
 			}
 
 			// Private
