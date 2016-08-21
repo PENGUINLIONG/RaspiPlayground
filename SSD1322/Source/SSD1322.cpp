@@ -48,7 +48,7 @@ namespace LiongStudio
 
 			void SSD1322::ClearRam()
 			{
-				BeginDrawing();
+				BeginDrawing(0, 0, 479, 127);
 				for (int y = 0; y < 64; y++)
 				{
 					for (int x = 0; x < 128; x++)
@@ -64,7 +64,7 @@ namespace LiongStudio
 			{
 				_L_MAKE_RV;
 
-				BeginDrawing();
+				BeginDrawing(0, 0, 255, 63);
 				_L_CHECK(SendCommand(SSD1322_WRITERAM));
 				_L_CHECK(SendData(_Bitmap, _Width * _Height / 2));
 				EndDrawing();
@@ -76,7 +76,7 @@ namespace LiongStudio
 			{
 				_L_MAKE_RV;
 
-				BeginDrawing();
+				BeginDrawing(0, 0, 255, 63);
 				color = (color & 0x0F) | (color << 4);
 
 				for (int y = 0; y < 64; y++)
@@ -130,12 +130,15 @@ namespace LiongStudio
 			}
 			bool SSD1322::SendData(unsigned char* field, int length)
 			{
-				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
-				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::High);
-				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::Low);
-				bool rv = _Spi->Transmit(field, nullptr, length) < 0;
-				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
-				return rv;
+				_L_MAKE_RV;
+
+				for (int x = 0; x < length;)
+				{
+					_L_CHECK(SendData(field[x++]));
+					_L_CHECK(SendData(field[x++]));
+				}
+				
+				_L_RETURN_ERR;
 			}
 
 			// Private
@@ -208,13 +211,13 @@ namespace LiongStudio
 				SendCommand(SSD1322_DISPLAYON); // 0xAF 
 			}
 
-			void SSD1322::BeginDrawing()
+			void SSD1322::BeginDrawing(int left, int top, int right, int bottom)
 			{
 				SendCommand(SSD1322_SETCOLUMNADDR);
-				SendData(0x00); SendData(0x77);
+				SendData(left); SendData(right);
 
 				SendCommand(SSD1322_SETROWADDR);
-				SendData(0x00); SendData(0x7F);
+				SendData(top / 4); SendData(bottom / 4);
 
 				SendCommand(SSD1322_WRITERAM);
 			}

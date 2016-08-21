@@ -90,7 +90,7 @@ namespace LiongStudio
 				bool SendData(unsigned char data);
 				bool SendData(unsigned char* field, int length);
 
-				void BeginDrawing();
+				void BeginDrawing(int left, int top, int right, int bottom);
 				void EndDrawing();
 			};
 		}
