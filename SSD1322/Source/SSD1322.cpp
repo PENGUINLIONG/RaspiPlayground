@@ -19,7 +19,7 @@ namespace LiongStudio
 				: _Info(info)
 				, _Width(width)
 				, _Height(height)
-				, _Bitmap(new unsigned char[width * height / 2])
+				, _Bitmap(new unsigned char[width * height])
 				, _Spi(new Spi(("/dev/spidev0." + std::to_string(_Info.Channel)).c_str(), _Info.MaxClock))
 			{
 				_Spi->SetPinMode(_Info.ResetPinId, Spi::PinMode::Output);
@@ -66,7 +66,7 @@ namespace LiongStudio
 
 				BeginDrawing(0, 0, 255, 63);
 				_L_CHECK(SendCommand(SSD1322_WRITERAM));
-				_L_CHECK(SendData(_Bitmap, _Width * _Height / 2));
+				_L_CHECK(SendData(_Bitmap, _Width * _Height));
 				EndDrawing();
 				
 				_L_RETURN_ERR;
@@ -83,7 +83,6 @@ namespace LiongStudio
 				{
 					for (int x = 0; x < 128; x++)
 					{
-						_L_CHECK(SendData(color));
 						_L_CHECK(SendData(color));
 					}
 				}
@@ -132,12 +131,8 @@ namespace LiongStudio
 			{
 				_L_MAKE_RV;
 
-				for (int x = 0; x < length;)
-				{
-					_L_CHECK(SendData(field[x++]));
-					_L_CHECK(SendData(field[x++]));
-				}
-				
+				for (int x = 0; x < length;) _L_CHECK(SendData(field[x++]));
+								
 				_L_RETURN_ERR;
 			}
 
@@ -163,8 +158,8 @@ namespace LiongStudio
 				SendData(0x00);
 
 				SendCommand(SSD1322_SETREMAP); // 0xA0 
-				SendData(0x14); //Horizontal address increment, Disable Column Address Re-map, Enable Nibble Re-map, Scan from COM[N-1] to COM0, Disable COM Split Odd Even 
-				SendData(0x11); //Enable Dual COM mode 
+				SendData(0x14); // Horizontal address increment, Disable Column Address Re-map, Enable Nibble Re-map, Scan from COM[N-1] to COM0, Disable COM Split Odd Even 
+				SendData(0x11); // Enable Dual COM mode 
 
 				SendCommand(SSD1322_SETGPIO); // 0xB5 
 				SendData(0x00); // Disable GPIO Pins Input 
@@ -174,7 +169,7 @@ namespace LiongStudio
 
 				SendCommand(SSD1322_DISPLAYENHANCE); // 0xB4 
 				SendData(0xA0); // enables the external VSL 
-				SendData(0xF8); // 0xfFD,Enhanced low GS display quality;default is 0xb5(normal), 
+				SendData(0xF8); // 0xfFD,Enhanced low GS display quality; default is 0xb5(normal), 
 
 				SendCommand(SSD1322_SETCONTRASTCURRENT); // 0xC1 
 				SendData(0xEF); // 0xFF - default is 0x7f 
@@ -183,8 +178,8 @@ namespace LiongStudio
 				SendData(0x0F); // default is 0x0F 
 
 				// Set grayscale 
-				//SendCommand(SSD1322_SELECTDEFAULTGRAYSCALE); // 0xB9 
-				SendCommand(SSD1322_SETGRAYSCALETABLE); //  	// Set Gray Scale Table 
+				// SendCommand(SSD1322_SELECTDEFAULTGRAYSCALE); // 0xB9 
+				SendCommand(SSD1322_SETGRAYSCALETABLE); // Set Gray Scale Table 
 				SendData(0x0C);
 				SendData(0x18);
 				SendData(0x24);
@@ -231,10 +226,10 @@ namespace LiongStudio
 			void SSD1322::BeginDrawing(int left, int top, int right, int bottom)
 			{
 				SendCommand(SSD1322_SETCOLUMNADDR);
-				SendData(left); SendData(right);
+				SendData(left / 4); SendData(right / 4);
 
 				SendCommand(SSD1322_SETROWADDR);
-				SendData(top / 4); SendData(bottom / 4);
+				SendData(top); SendData(bottom);
 
 				SendCommand(SSD1322_WRITERAM);
 			}
