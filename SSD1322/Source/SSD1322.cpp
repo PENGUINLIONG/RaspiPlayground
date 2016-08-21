@@ -4,9 +4,8 @@
 #include <iostream>
 
 #define _L_MAKE_RV bool rv = false
-#define _L_CHECK rv |= !
+#define _L_CHECK std::cout << !(rv |= !)
 #define _L_RETURN_ERR return !rv
-#define _L_LOG_RV std::cout << rv << ' '
 
 namespace LiongStudio
 {
@@ -14,6 +13,8 @@ namespace LiongStudio
 	{
 		namespace Devices
 		{
+			using namespace std::chrono_literals;
+			
 			SSD1322::SSD1322(SSD1322Info info, int width, int height)
 				: _Info(info)
 				, _Width(width)
@@ -63,10 +64,10 @@ namespace LiongStudio
 			{
 				_L_MAKE_RV;
 
+				BeginDrawing();
 				_L_CHECK SendCommand(SSD1322_WRITERAM);
-				_L_LOG_RV;
 				_L_CHECK SendData(_Bitmap, _Width * _Height / 2);
-				_L_LOG_RV;
+				EndDrawing();
 				
 				_L_RETURN_ERR;
 			}
@@ -75,6 +76,7 @@ namespace LiongStudio
 			{
 				_L_MAKE_RV;
 
+				BeginDrawing();
 				color = (color & 0x0F) | (color << 4);
 
 				for (int y = 0; y < 64; y++)
@@ -85,8 +87,7 @@ namespace LiongStudio
 						_L_CHECK SendData(color);
 					}
 				}
-				_L_LOG_RV;
-				std::this_thread::sleep_for(10ms);
+				EndDrawing();
 
 				_L_RETURN_ERR;
 			}
