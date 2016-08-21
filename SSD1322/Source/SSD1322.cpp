@@ -45,23 +45,23 @@ namespace LiongStudio
 				}
 			}
 
+			void SSD1322::ClearRam()
+			{
+				BeginDrawing();
+				for (int y = 0; y < 64; y++)
+				{
+					for (int x = 0; x < 128; x++)
+					{
+						SendData(0x00);
+						SendData(0x00);
+					}
+				}
+				EndDrawing();
+			}
+
 			bool SSD1322::Flush()
 			{
 				_L_MAKE_RV;
-
-				_L_CHECK SendCommand(SSD1322_SETCOLUMNADDR);
-				_L_LOG_RV;
-				_L_CHECK SendData(MIN_SEG);
-				_L_LOG_RV;
-				_L_CHECK SendData(MAX_SEG);
-				_L_LOG_RV;
-
-				_L_CHECK SendCommand(SSD1322_SETROWADDR);
-				_L_LOG_RV;
-				_L_CHECK SendData(0);
-				_L_LOG_RV;
-				_L_CHECK SendData(0x7F);
-				_L_LOG_RV;
 
 				_L_CHECK SendCommand(SSD1322_WRITERAM);
 				_L_LOG_RV;
@@ -75,33 +75,18 @@ namespace LiongStudio
 			{
 				_L_MAKE_RV;
 
-				_L_CHECK SendCommand(SSD1322_SETCOLUMNADDR);
-				_L_LOG_RV;
-				_L_CHECK SendData(MIN_SEG);
-				_L_LOG_RV;
-				_L_CHECK SendData(MAX_SEG);
-				_L_LOG_RV;
-
-				_L_CHECK SendCommand(SSD1322_SETROWADDR);
-				_L_LOG_RV;
-				_L_CHECK SendData(0);
-				_L_LOG_RV;
-				_L_CHECK SendData(0x7F);
-				_L_LOG_RV;
-
 				color = (color & 0x0F) | (color << 4);
 
-				_L_CHECK SendCommand(SSD1322_WRITERAM);
-				_L_LOG_RV;
-
-				for (int y = 0; y < 128; y++)
+				for (int y = 0; y < 64; y++)
 				{
-					for (int x = 0; x < 64; x++)
+					for (int x = 0; x < 128; x++)
 					{
 						_L_CHECK SendData(color);
 						_L_CHECK SendData(color);
 					}
 				}
+				_L_LOG_RV;
+				std::this_thread::sleep_for(10ms);
 
 				_L_RETURN_ERR;
 			}
@@ -120,6 +105,7 @@ namespace LiongStudio
 				_Spi->SetPinVoltage(_Info.ResetPinId, Spi::PinVoltage::Low);
 				std::this_thread::sleep_for(10ms);
 				_Spi->SetPinVoltage(_Info.ResetPinId, Spi::PinVoltage::High);
+				Launch();
 			}
 
 			bool SSD1322::SendCommand(unsigned char cmd)
@@ -184,10 +170,10 @@ namespace LiongStudio
 
 				SendCommand(SSD1322_DISPLAYENHANCE); // 0xB4 
 				SendData(0xA0); // enables the external VSL 
-				SendData(0xFD); // 0xfFD,Enhanced low GS display quality;default is 0xb5(normal), 
+				SendData(0xF8); // 0xfFD,Enhanced low GS display quality;default is 0xb5(normal), 
 
 				SendCommand(SSD1322_SETCONTRASTCURRENT); // 0xC1 
-				SendData(0xFF); // 0xFF - default is 0x7f 
+				SendData(0xEF); // 0xFF - default is 0x7f 
 
 				SendCommand(SSD1322_MASTERCURRENTCONTROL); // 0xC7 
 				SendData(0x0F); // default is 0x0F 
@@ -199,7 +185,7 @@ namespace LiongStudio
 				SendData(0xE2); // default is 0x74 
 
 				SendCommand(SSD1322_DISPLAYENHANCEB);// 0xD1 
-				SendData(0x82); // Reserved; default is 0xa2(normal) 
+				SendData(0xA2); // Reserved; default is 0xa2(normal) 
 				SendData(0x20); // 
 
 				SendCommand(SSD1322_SETPRECHARGEVOLTAGE); // 0xBB 
@@ -213,14 +199,29 @@ namespace LiongStudio
 
 				SendCommand(SSD1322_NORMALDISPLAY); // 0xA6 
 
-				SendCommand(SSD1322_EXITPARTIALDISPLAY); // 0xA9 
+				SendCommand(SSD1322_EXITPARTIALDISPLAY); // 0xA9
 				
 				// Clear down image ram before opening display 
-				FillScreen(0x7F);
+				FillScreen(0x00);
 
 				SendCommand(SSD1322_DISPLAYON); // 0xAF 
 			}
 
+			void SSD1322::BeginDrawing()
+			{
+				SendCommand(SSD1322_SETCOLUMNADDR);
+				SendData(0x00); SendData(0x77);
+
+				SendCommand(SSD1322_SETROWADDR);
+				SendData(0x00); SendData(0x7F);
+
+				SendCommand(SSD1322_WRITERAM);
+			}
+
+			void SSD1322::EndDrawing()
+			{
+				std::this_thread::sleep_for(10ms);
+			}
 		}
 	}
 }
