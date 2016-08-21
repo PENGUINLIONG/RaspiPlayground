@@ -4,7 +4,7 @@
 #include <iostream>
 
 #define _L_MAKE_RV bool rv = false
-#define _L_CHECK std::cout << !(rv |= !)
+#define _L_CHECK(x) std::cout << !(rv |= !(x))
 #define _L_RETURN_ERR return !rv
 
 namespace LiongStudio
@@ -65,8 +65,8 @@ namespace LiongStudio
 				_L_MAKE_RV;
 
 				BeginDrawing();
-				_L_CHECK SendCommand(SSD1322_WRITERAM);
-				_L_CHECK SendData(_Bitmap, _Width * _Height / 2);
+				_L_CHECK(SendCommand(SSD1322_WRITERAM));
+				_L_CHECK(SendData(_Bitmap, _Width * _Height / 2));
 				EndDrawing();
 				
 				_L_RETURN_ERR;
@@ -83,8 +83,8 @@ namespace LiongStudio
 				{
 					for (int x = 0; x < 128; x++)
 					{
-						_L_CHECK SendData(color);
-						_L_CHECK SendData(color);
+						_L_CHECK(SendData(color));
+						_L_CHECK(SendData(color));
 					}
 				}
 				EndDrawing();
