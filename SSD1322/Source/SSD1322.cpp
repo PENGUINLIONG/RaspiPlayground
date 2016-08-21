@@ -72,23 +72,10 @@ namespace LiongStudio
 				_L_RETURN_ERR;
 			}
 
-			bool SSD1322::FillScreen(unsigned char color)
+			void SSD1322::FillScreen(unsigned char color)
 			{
-				_L_MAKE_RV;
-
-				BeginDrawing(0, 0, 255, 63);
-				color = (color & 0x0F) | (color << 4);
-
-				for (int y = 0; y < 64; y++)
-				{
-					for (int x = 0; x < 128; x++)
-					{
-						_L_CHECK(SendData(color));
-					}
-				}
-				EndDrawing();
-
-				_L_RETURN_ERR;
+				size_t length = _Width * _Height;
+				while (length > 0) _Bitmap[0] = color;
 			}
 
 			void SSD1322::GetBitmap(unsigned char*& bitmap, int& width, int& height)
