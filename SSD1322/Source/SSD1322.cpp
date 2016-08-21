@@ -183,7 +183,24 @@ namespace LiongStudio
 				SendData(0x0F); // default is 0x0F 
 
 				// Set grayscale 
-				SendCommand(SSD1322_SELECTDEFAULTGRAYSCALE); // 0xB9 
+				//SendCommand(SSD1322_SELECTDEFAULTGRAYSCALE); // 0xB9 
+				SendCommand(SSD1322_SETGRAYSCALETABLE); //  	// Set Gray Scale Table 
+				SendData(0x0C);
+				SendData(0x18);
+				SendData(0x24);
+				SendData(0x30);
+				SendData(0x3C);
+				SendData(0x48);
+				SendData(0x54);
+				SendData(0x60);
+				SendData(0x6C);
+				SendData(0x78);
+				SendData(0x84);
+				SendData(0x90);
+				SendData(0x9C);
+				SendData(0xA8);
+				SendData(0xB4);
+ 				SendCommand(SSD1322_ENABLEGRAYSCALETABLE);
 
 				SendCommand(SSD1322_SETPHASELENGTH); // 0xB1 
 				SendData(0xE2); // default is 0x74 

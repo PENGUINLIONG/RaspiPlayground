@@ -49,6 +49,8 @@ int main()
 	std::cout << "Filling screen..." << std::endl;
 	dev.FillScreen(0xFF);
 	std::this_thread::sleep_for(5000ms);
+	dev.SendCommand(0xA7);
+	std::this_thread::sleep_for(5000ms);
 	std::cout << "Done." << std::endl;
 	
 	dev.SendCommand(SSD1322_DISPLAYOFF);
