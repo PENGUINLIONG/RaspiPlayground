@@ -49,6 +49,7 @@ int main()
 	std::cout << "Filling screen..." << std::endl;
 	dev.FillScreen(0xFF);
 	std::this_thread::sleep_for(5000ms);
+	std::cout << "Inverting color..." << std::endl;
 	dev.SendCommand(0xA7);
 	std::this_thread::sleep_for(5000ms);
 	std::cout << "Done." << std::endl;

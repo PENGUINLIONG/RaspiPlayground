@@ -4,7 +4,7 @@
 #include <iostream>
 
 #define _L_MAKE_RV bool rv = false
-#define _L_CHECK(x) std::cout << !(rv |= !(x))
+#define _L_CHECK(x) rv |= !(x)
 #define _L_RETURN_ERR return !rv
 
 namespace LiongStudio
@@ -131,8 +131,8 @@ namespace LiongStudio
 			{
 				_L_MAKE_RV;
 
-				for (int x = 0; x < length;) _L_CHECK(SendData(field[x++]));
-								
+				for (int x = 0; x < length; ++x) _L_CHECK(SendData(field[x]));
+
 				_L_RETURN_ERR;
 			}
 
