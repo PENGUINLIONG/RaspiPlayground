@@ -85,7 +85,7 @@ namespace LiongStudio
 
 				void ClearRam();
 				bool Flush();
-				bool FillScreen(unsigned char color);
+				void FillScreen(unsigned char color);
 				void GetBitmap(unsigned char*& bitmap, int& width, int& height);
 				void Reset();
 				bool SendCommand(unsigned char cmd);
