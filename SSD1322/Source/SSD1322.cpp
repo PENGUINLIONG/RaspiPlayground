@@ -75,7 +75,7 @@ namespace LiongStudio
 			void SSD1322::FillScreen(unsigned char color)
 			{
 				size_t length = _Width * _Height;
-				while (length > 0) _Bitmap[0] = color;
+				while (length > 0) _Bitmap[--length] = color;
 			}
 
 			void SSD1322::GetBitmap(unsigned char*& bitmap, int& width, int& height)
