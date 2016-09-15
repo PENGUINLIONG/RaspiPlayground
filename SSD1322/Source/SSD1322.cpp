@@ -66,7 +66,9 @@ namespace LiongStudio
 
 				BeginDrawing(0, 0, 255, 63);
 				_L_CHECK(SendCommand(SSD1322_WRITERAM));
+				std::cout << rv;
 				_L_CHECK(SendData(_Bitmap, _Width * _Height));
+				std::cout << rv;
 				EndDrawing();
 				
 				_L_RETURN_ERR;
