@@ -3,12 +3,8 @@
 #include <chrono>
 #include <iostream>
 
-// The return value will be false if error occurred.
-#define _L_MAKE_RV bool rv = false
-#define _L_CHECK(x) rv |= !(x)
-#define _L_RETURN_ERR return !rv
-
 #define _L_MAKEBYTE(h, l) (h << 4) | (l & 0x0F)
+#define _L_SELF return *this
 
 namespace LiongStudio
 {
@@ -24,7 +20,7 @@ namespace LiongStudio
 				, _Height(height)
 				, _Bitmap(new unsigned char[width * height])
 				, _Brightness(1.0)
-				, _Spi(new Spi(("/dev/spidev0." + std::to_string(_Info.Channel)).c_str(), _Info.MaxClock))
+				, _Spi(new Spi(_Info.Channel, _Info.MaxClock))
 			{
 				_Spi->SetPinMode(_Info.ResetPinId, Spi::PinMode::Output);
 				_Spi->SetPinVoltage(_Info.ResetPinId, Spi::PinVoltage::High);
@@ -51,45 +47,33 @@ namespace LiongStudio
 				}
 			}
 
-			void SSD1322::ClearRam()
+			SSD1322& SSD1322::ClearRam()
 			{
-				BeginDrawing(0, 0, 479, 127);
-				for (int y = 0; y < 64; y++)
-				{
-					for (int x = 0; x < 128; x++)
-					{
-						SendData(0x00);
-						SendData(0x00);
-					}
-				}
+				BeginDrawing(0, 0, 476, 127);
+				auto i = 120 * 128 / 2;
+				while (i-- > 0) SendData(0x00);
 				EndDrawing();
+				_L_SELF;
 			}
 
-			bool SSD1322::Flush()
+			SSD1322& SSD1322::Flush()
 			{
-				_L_MAKE_RV;
 
 				BeginDrawing(0, 0, 255, 63);
-				_L_CHECK(SendData(_Bitmap, _Width * _Height));
+				SendData(_Bitmap, _Width * _Height);
 				EndDrawing();
-				
-				_L_RETURN_ERR;
+				_L_SELF;
 			}
 
-			void SSD1322::FillScreen(unsigned char color)
-			{
-				size_t length = _Width * _Height;
-				while (length > 0) _Bitmap[--length] = color;
-			}
-
-			void SSD1322::GetBitmap(unsigned char*& bitmap, int& width, int& height)
+			SSD1322& SSD1322::GetBitmap(unsigned char*& bitmap, int& width, int& height)
 			{
 				bitmap = _Bitmap;
 				width = _Width;
 				height = _Height;
+				_L_SELF;
 			}
 
-			void SSD1322::Reset()
+			SSD1322& SSD1322::Reset()
 			{
 				using namespace std::chrono_literals;
 
@@ -97,45 +81,75 @@ namespace LiongStudio
 				std::this_thread::sleep_for(10ms);
 				_Spi->SetPinVoltage(_Info.ResetPinId, Spi::PinVoltage::High);
 				Launch();
+				_L_SELF;
 			}
 
-			bool SSD1322::SendCommand(unsigned char cmd)
+			SSD1322& SSD1322::SendCommand(unsigned char cmd)
 			{
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::Low);
 				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::Low);
-				bool rv = _Spi->Transmit(&cmd, nullptr, 1) >= 0;
+				_Spi->Transmit(cmd);
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
-				return rv;
+				_L_SELF;
 			}
 
-			bool SSD1322::SendData(unsigned char data)
+			SSD1322& SSD1322::SendData(unsigned char data)
 			{
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::Low);
 				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::High);
-				bool rv = _Spi->Transmit(&data, nullptr, 1) >= 0;
+				_Spi->Transmit(data);
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
-				return rv;
+				_L_SELF;
 			}
-			bool SSD1322::SendData(unsigned char* field, int length)
+			SSD1322& SSD1322::SendData(unsigned char* field, int length)
 			{
-				//_L_MAKE_RV;
-
-				//for (int x = 0; x < length;)
-				//	_L_CHECK(SendData(_L_MAKEBYTE(field[x++], field[x++])));
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::Low);
 				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::High);
-				bool rv = _Spi->Transmit(field, nullptr, 1) >= 0;
+				_Spi->Transmit(field, length);
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
-
-				//_L_RETURN_ERR;
+				_L_SELF;
 			}
+
+
+			// Auxiliary Drawing Methods
+
+
+			SSD1322& SSD1322::BeginDrawing(int left, int top, int right, int bottom)
+			{
+				SendCommand(SSD1322_SETCOLUMNADDR);
+				SendData(left / 4); SendData(right / 4);
+
+				SendCommand(SSD1322_SETROWADDR);
+				SendData(top); SendData(bottom);
+
+				SendCommand(SSD1322_WRITERAM);
+				_L_SELF;
+			}
+
+			SSD1322& SSD1322::EndDrawing()
+			{
+				std::this_thread::sleep_for(10ms);
+				_L_SELF;
+			}
+
+
+
+			SSD1322& SSD1322::FillScreen(unsigned char color)
+			{
+				size_t length = _Width * _Height;
+				while (length > 0) _Bitmap[--length] = color;
+				_L_SELF;
+			}
+
 
 			// Private
+			
 
 			void SSD1322::Launch()
 			{
 				SendCommand(SSD1322_SETCOMMANDLOCK); SendData(0x12);
 				SendCommand(SSD1322_DISPLAYOFF);
+				SendCommand(SSD1322_SELECTDEFAULTGRAYSCALE);
 				// Front clock is devided by 2, oscilator frequancy is 1001b.
 				SendCommand(SSD1322_SETCLOCKDIVIDER); SendData(0x91);
 				// SendCommand(SSD1322_SETMUXRATIO); SendData(0x3F); // Duty = 1/64.
@@ -156,22 +170,6 @@ namespace LiongStudio
 				// Clear down image ram before opening display 
 				FillScreen(0x00);
 				SendCommand(SSD1322_DISPLAYON);
-			}
-
-			void SSD1322::BeginDrawing(int left, int top, int right, int bottom)
-			{
-				SendCommand(SSD1322_SETCOLUMNADDR);
-				SendData(left / 4); SendData(right / 4);
-
-				SendCommand(SSD1322_SETROWADDR);
-				SendData(top); SendData(bottom);
-
-				SendCommand(SSD1322_WRITERAM);
-			}
-
-			void SSD1322::EndDrawing()
-			{
-				std::this_thread::sleep_for(10ms);
 			}
 		}
 	}
