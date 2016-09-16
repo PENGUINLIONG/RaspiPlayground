@@ -19,7 +19,7 @@ namespace LiongStudio
 			enum class PinMode : unsigned char { Input, Output, None };
 			enum class PinVoltage { Low = 0, High = 1 };
 
-			Spi(int deviceId);
+			Spi(int deviceId, int maxClock);
 			Spi(const Spi& instance) = delete;
 			~Spi();
 

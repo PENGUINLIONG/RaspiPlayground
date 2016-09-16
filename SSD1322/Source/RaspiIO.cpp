@@ -28,7 +28,7 @@ namespace LiongStudio
 
 		volatile unsigned int* Spi::_Gpio = nullptr;
 		
-		Spi::Spi(int deviceId)
+		Spi::Spi(int deviceId, int maxClock)
 		{
 			if (_Gpio == nullptr) InitGpio();
 

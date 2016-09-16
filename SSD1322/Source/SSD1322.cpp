@@ -20,7 +20,7 @@ namespace LiongStudio
 				, _Height(height)
 				, _Bitmap(new unsigned char[width * height])
 				, _Brightness(1.0)
-				, _Spi(new Spi(_Info.Channel))
+				, _Spi(new Spi(_Info.Channel, _Info.MaxClock))
 			{
 				_Spi->SetPinMode(_Info.ResetPinId, Spi::PinMode::Output);
 				_Spi->SetPinVoltage(_Info.ResetPinId, Spi::PinVoltage::High);
