@@ -36,7 +36,6 @@ int main()
 	info.ResetPinId = 11;
 	info.DcPinId = 13;
 	info.CsPinId = 24;
-	info.MaxClock = 1000000;
 	std::cout << "Configuration finished! Trying to create instance." << std::endl;
 	SSD1322 dev(info, 256, 64);
 

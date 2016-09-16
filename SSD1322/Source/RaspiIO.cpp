@@ -1,8 +1,6 @@
 #include <fcntl.h>
-#include <linux/spi/spidev.h>
 #include <memory>
 #include <sys/mman.h>
-#include <sys/ioctl.h>
 #include <unistd.h>
 #include "../Include/RaspiIO.hpp"
 
@@ -38,10 +36,6 @@ namespace LiongStudio
 			SetPinVoltage(_ClockPinId, PinVoltage::High);
 			SetPinMode(_MosiPinId, PinMode::Output);
 			SetPinVoltage(_MosiPinId, PinVoltage::Low);
-		}
-		Spi::Spi(Spi&& instance)
-		{
-			swap(*this, instance);
 		}
 		Spi::~Spi()
 		{
