@@ -30,14 +30,23 @@ namespace LiongStudio
 
 		volatile unsigned int* Spi::_Gpio = nullptr;
 		
-		Spi::Spi(int deviceId, int maxClock)
+		Spi::Spi(std::string deviceName, int maxClock)
+			: _Mode(0)
+			, _BitsPerWord(8)
+			, _Delay(0)
+			, _MaxClock(maxClock)
+			, _FileDevice(open(deviceName.c_str(), O_RDWR))
 		{
 			if (_Gpio == nullptr) InitGpio();
+			if (_FileDevice < 0) throw std::runtime_error("Unable to open " + deviceName + ".");
 
-			SetPinMode(_ClockPinId, PinMode::Output);
-			SetPinVoltage(_ClockPinId, PinVoltage::High);
-			SetPinMode(_MosiPinId, PinMode::Output);
-			SetPinVoltage(_MosiPinId, PinVoltage::Low);
+			if ((ioctl(_FileDevice, SPI_IOC_WR_MODE, &_Mode) < 0) ||
+				(ioctl(_FileDevice, SPI_IOC_RD_MODE, &_Mode) < 0) ||
+				(ioctl(_FileDevice, SPI_IOC_WR_BITS_PER_WORD, &_BitsPerWord) < 0) ||
+				(ioctl(_FileDevice, SPI_IOC_RD_BITS_PER_WORD, &_BitsPerWord) < 0) ||
+				(ioctl(_FileDevice, SPI_IOC_WR_MAX_SPEED_HZ, &_MaxClock) < 0) ||
+				(ioctl(_FileDevice, SPI_IOC_RD_MAX_SPEED_HZ, &_MaxClock) < 0))
+				throw std::runtime_error("Unable to set up SPI.");
 		}
 		Spi::Spi(Spi&& instance)
 		{
@@ -45,6 +54,7 @@ namespace LiongStudio
 		}
 		Spi::~Spi()
 		{
+			close(_FileDevice);
 		}
 
 		void Spi::InitGpio()
@@ -72,21 +82,18 @@ namespace LiongStudio
 			Spi::_Gpio = (volatile unsigned int*)gpio_map;
 		}
 
-		void Spi::Transmit(unsigned char data)
+		int Spi::Transmit(unsigned char* output, unsigned char* input, size_t length)
 		{
-			size_t i = 0;
-			while (i < 8)
-			{
-				SetPinVoltage(_ClockPinId, PinVoltage::Low);
-				SetPinVoltage(_MosiPinId, (PinVoltage)(data & (1 << i++)));
-				SetPinVoltage(_ClockPinId, PinVoltage::High);
-			}
-		}
-		void Spi::Transmit(unsigned char* data, size_t length)
-		{
-			auto end = data + length;
-			while (data < end)
-				Transmit(*(data++));
+			spi_ioc_transfer spi;
+
+			spi.tx_buf = (unsigned long)output;
+			spi.rx_buf = (unsigned long)input;
+			spi.len = length;
+			spi.delay_usecs = _Delay;
+			spi.speed_hz = _MaxClock;
+			spi.bits_per_word = _BitsPerWord;
+
+			return ioctl(_FileDevice, SPI_IOC_MESSAGE(1), &spi);
 		}
 
 		void Spi::SetPinMode(int pinId, Spi::PinMode mode)
@@ -100,5 +107,8 @@ namespace LiongStudio
 			if (voltage == Spi::PinVoltage::Low) GPIO_CLR = 1 << pinId;
 			else GPIO_SET = 1 << pinId;
 		}
+
+
+
 	}
 }

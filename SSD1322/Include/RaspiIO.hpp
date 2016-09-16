@@ -19,7 +19,11 @@ namespace LiongStudio
 				swap(a._FileDevice, b._FileDevice);
 			}
 		private:
-			const int _MosiPinId = 19, _ClockPinId = 23;
+			uint8_t _Mode;
+			uint8_t _BitsPerWord;
+			uint16_t _Delay;
+			uint32_t _MaxClock;
+			int _FileDevice;
 
 			static volatile unsigned int* _Gpio;
 
@@ -29,7 +33,7 @@ namespace LiongStudio
 			enum class PinMode : unsigned char { Input, Output, None };
 			enum class PinVoltage { Low = 0, High = 1 };
 
-			Spi(int deviceId, int maxClock);
+			Spi(std::string deviceName, int maxClock);
 			Spi(const Spi& instance) = delete;
 			Spi(Spi&& instance);
 			~Spi();
@@ -46,8 +50,7 @@ namespace LiongStudio
 			 *   The length of these two buffer must be the same.
 			 *   $input can be the same buffer as $output.
 			 */
-			void Transmit(unsigned char data);
-			void Transmit(unsigned char* field, size_t length);
+			int Transmit(unsigned char* output, unsigned char* input, size_t length);
 
 			static void SetPinMode(int pinId, Spi::PinMode mode);
 			static void SetPinVoltage(int pinId, Spi::PinVoltage voltage);

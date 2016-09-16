@@ -43,7 +43,7 @@ int main()
 	std::cout << "Set entire screen on." << std::endl;
 	dev.SendCommand(0xA5);
 	std::this_thread::sleep_for(5000ms);
-	dev.SendCommand(0xA6);
+	dev.SendCommand(0xA4);
 
 	std::cout << "Printing pattern..." << std::endl;
 	printPattern(dev);

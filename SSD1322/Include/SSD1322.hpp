@@ -89,12 +89,12 @@ namespace LiongStudio
 				// Note:
 				//   This method will directly clear the entire buffer on SSD1322 device with the buffer on host device not modified.
 				//   Should be distinguished from FillScreen(0x00).
-				SSD1322& ClearRam();
+				void ClearRam();
 				// Method:
 				//   Write the data in host buffer to SSD1322 device buffer.
 				// Return:
 				//   True if an error occurred, false otherwise.
-				SSD1322& Flush();
+				bool Flush();
 
 				// Method:
 				//   Get the information about the buffer on host device.
@@ -102,26 +102,32 @@ namespace LiongStudio
 				//   $bitmap: [OUT] Pointer to the buffer.
 				//   $width: [OUT] Width of the client area.
 				//   $height: [OUT] Height of the client area.
-				SSD1322& GetBitmap(unsigned char*& bitmap, int& width, int& height);
+				void GetBitmap(unsigned char*& bitmap, int& width, int& height);
 				// Method:
 				//   Reset the SSD1322 device.
-				SSD1322& Reset();
+				void Reset();
 				// Method:
 				//   Send command of one byte to the SSD1322 device.
 				// Params:
 				//   $data: Command to be transmitted.
-				SSD1322& SendCommand(unsigned char cmd);
+				// Return:
+				//   True if an error occurred, false otherwise.
+				bool SendCommand(unsigned char cmd);
 				// Method:
 				//   Send data of one byte to the SSD1322 device.
 				// Params:
 				//   $data: Data to be transmitted.
-				SSD1322& SendData(unsigned char data);
+				// Return:
+				//   True if an error occurred, false otherwise.
+				bool SendData(unsigned char data);
 				// Method:
 				//   Send a data sequence to the SSD1322 device.
 				// Params:
 				//   $field: The data sequence to be transmitted.
 				//   $length: Length of $field.
-				SSD1322& SendData(unsigned char* field, int length);
+				// Return:
+				//   True if an error occurred, false otherwise.
+				bool SendData(unsigned char* field, int length);
 
 
 				// Auxiliary Drawing Methods
@@ -131,19 +137,19 @@ namespace LiongStudio
 				//   Begin a drawing session to device.
 				// Params:
 				//   $~: Boundaries of drawable client area.
-				SSD1322& BeginDrawing(int left, int top, int right, int bottom);
+				void BeginDrawing(int left, int top, int right, int bottom);
 				// Method:
 				//   End up a drawing session to device.
 				//   Currently do nothing but sleep for 10ms.
 				// Params:
 				//   $~: Boundaries of drawable client area.
-				SSD1322& EndDrawing();
+				void EndDrawing();
 
 				// Method:
 				//   Fill the entire buffer with the specified color.
 				// Params:
 				//   $color: Color used to fill the buffer.
-				SSD1322& FillScreen(unsigned char color);
+				void FillScreen(unsigned char color);
 			};
 		}
 	}
