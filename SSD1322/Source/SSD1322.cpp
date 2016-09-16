@@ -120,16 +120,12 @@ namespace LiongStudio
 			}
 			bool SSD1322::SendData(unsigned char* field, int length)
 			{
-				//_L_MAKE_RV;
+				_L_MAKE_RV;
 
-				//for (int x = 0; x < length;)
-				//	_L_CHECK(SendData(_L_MAKEBYTE(field[x++], field[x++])));
-				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::Low);
-				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::High);
-				bool rv = _Spi->Transmit(field, nullptr, 1) >= 0;
-				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
+				for (int x = 0; x < length;)
+					_L_CHECK(SendData(_L_MAKEBYTE(field[x++], field[x++])));
 
-				//_L_RETURN_ERR;
+				_L_RETURN_ERR;
 			}
 
 			// Private
