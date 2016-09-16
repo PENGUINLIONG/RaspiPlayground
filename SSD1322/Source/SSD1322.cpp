@@ -6,7 +6,7 @@
 // The return value will be false if error occurred.
 #define _L_MAKE_RV bool rv = false
 #define _L_CHECK(x) rv |= !(x)
-#define _L_RETURN_ERR std::cout << !rv; return !rv
+#define _L_RETURN_ERR return !rv
 
 #define _L_MAKEBYTE(h, l) (h << 4) | (l & 0x0F)
 
@@ -101,9 +101,8 @@ namespace LiongStudio
 
 			bool SSD1322::SendCommand(unsigned char cmd)
 			{
-				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
-				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::Low);
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::Low);
+				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::Low);
 				bool rv = _Spi->Transmit(&cmd, nullptr, 1) >= 0;
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
 				return rv;
@@ -111,9 +110,8 @@ namespace LiongStudio
 
 			bool SSD1322::SendData(unsigned char data)
 			{
-				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
-				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::High);
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::Low);
+				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::High);
 				bool rv = _Spi->Transmit(&data, nullptr, 1) >= 0;
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
 				return rv;
@@ -132,12 +130,14 @@ namespace LiongStudio
 
 			void SSD1322::Launch()
 			{
+				SendCommand(SSD1322_SETCOMMANDLOCK); SendData(0x12);
 				SendCommand(SSD1322_DISPLAYOFF);
 				// Front clock is devided by 2, oscilator frequancy is 1001b.
 				SendCommand(SSD1322_SETCLOCKDIVIDER); SendData(0x91);
 				// SendCommand(SSD1322_SETMUXRATIO); SendData(0x3F); // Duty = 1/64.
 				// Disable GPIO Pins Input.
 				SendCommand(SSD1322_SETGPIO); SendData(0x00);
+				SendCommand(SSD1322_SETMUXRATIO); SendData(_Height - 1);
 				// Enables the external VSL, enhance low GS display quality.
 				SendCommand(SSD1322_DISPLAYENHANCE); SendData(0xA0); SendData(0xFD);
 				SendCommand(SSD1322_MASTERCURRENTCONTROL); SendData((unsigned char)(_Brightness * 255.0));
