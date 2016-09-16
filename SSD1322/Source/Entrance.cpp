@@ -25,7 +25,7 @@ void printPattern(SSD1322& dev)
 				bitmap[row * width + col] = 0xFF;
 		}
 	}
-	std::cout << "Printing returned: " << (dev.Flush() ? "true" : "false") << '.' << std::endl;
+	dev.Flush();
 }
 
 int main()
@@ -51,7 +51,7 @@ int main()
 
 	std::cout << "Filling screen..." << std::endl;
 	dev.FillScreen(0xFF);
-	std::cout << "Returned " << (dev.Flush() ? "true" : "false") << std::endl;
+	dev.Flush();
 	std::this_thread::sleep_for(5000ms);
 	
 	std::cout << "Inverting color..." << std::endl;

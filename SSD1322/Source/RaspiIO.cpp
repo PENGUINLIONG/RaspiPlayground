@@ -7,9 +7,9 @@
 #include "../Include/RaspiIO.hpp"
 
 /*
-*  GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x) or SET_GPIO_ALT(x,y)
+*  GPIO setup macros. Always use IN_GPIO(x) before using OUT_GPIO(x) or SET_GPIO_ALT(x,y)
 */
-#define INP_GPIO(g) *(_Gpio + ((g) / 10)) &= ~(7 << (((g) % 10) * 3))
+#define IN_GPIO(g) *(_Gpio + ((g) / 10)) &= ~(7 << (((g) % 10) * 3))
 #define OUT_GPIO(g) *(_Gpio + ((g) / 10)) |=  (1 << (((g) % 10) * 3))
 #define SET_GPIO_ALT(g,a) *(_Gpio + (((g) / 10))) |= (((a) <= 3 ? (a) + 4 : (a) == 4 ? 3 : 2) << (((g) % 10) * 3))
 
@@ -98,7 +98,7 @@ namespace LiongStudio
 
 		void Spi::SetPinMode(int pinId, Spi::PinMode mode)
 		{
-			INP_GPIO(pinId);
+			IN_GPIO(pinId);
 			if (mode == Spi::PinMode::Output) OUT_GPIO(pinId);
 		}
 
