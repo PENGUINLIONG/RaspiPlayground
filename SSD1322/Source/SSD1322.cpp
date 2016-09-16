@@ -3,9 +3,12 @@
 #include <chrono>
 #include <iostream>
 
+// The return value will be false if error occurred.
 #define _L_MAKE_RV bool rv = false
 #define _L_CHECK(x) rv |= !(x)
-#define _L_RETURN_ERR return !rv
+#define _L_RETURN_ERR std::cout << !rv; return !rv
+
+#define _L_MAKEBYTE(h, l) (h << 4) | (l & 0x0F)
 
 namespace LiongStudio
 {
@@ -20,6 +23,7 @@ namespace LiongStudio
 				, _Width(width)
 				, _Height(height)
 				, _Bitmap(new unsigned char[width * height])
+				, _Brightness(1.0)
 				, _Spi(new Spi(("/dev/spidev0." + std::to_string(_Info.Channel)).c_str(), _Info.MaxClock))
 			{
 				_Spi->SetPinMode(_Info.ResetPinId, Spi::PinMode::Output);
@@ -33,6 +37,7 @@ namespace LiongStudio
 				, _Width(0)
 				, _Height(0)
 				, _Bitmap(nullptr)
+				, _Brightness(0)
 				, _Spi(nullptr)
 			{
 				swap(*this, instance);
@@ -65,10 +70,7 @@ namespace LiongStudio
 				_L_MAKE_RV;
 
 				BeginDrawing(0, 0, 255, 63);
-				_L_CHECK(SendCommand(SSD1322_WRITERAM));
-				std::cout << rv;
 				_L_CHECK(SendData(_Bitmap, _Width * _Height));
-				std::cout << rv;
 				EndDrawing();
 				
 				_L_RETURN_ERR;
@@ -102,7 +104,7 @@ namespace LiongStudio
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
 				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::Low);
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::Low);
-				bool rv = _Spi->Transmit(&cmd, nullptr, 1) < 0;
+				bool rv = _Spi->Transmit(&cmd, nullptr, 1) >= 0;
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
 				return rv;
 			}
@@ -112,7 +114,7 @@ namespace LiongStudio
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
 				_Spi->SetPinVoltage(_Info.DcPinId, Spi::PinVoltage::High);
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::Low);
-				bool rv = _Spi->Transmit(&data, nullptr, 1) < 0;
+				bool rv = _Spi->Transmit(&data, nullptr, 1) >= 0;
 				_Spi->SetPinVoltage(_Info.CsPinId, Spi::PinVoltage::High);
 				return rv;
 			}
@@ -120,7 +122,8 @@ namespace LiongStudio
 			{
 				_L_MAKE_RV;
 
-				for (int x = 0; x < length; ++x) _L_CHECK(SendData(field[x]));
+				for (int x = 0; x < length;)
+					_L_CHECK(SendData(_L_MAKEBYTE(field[x++], field[x++])));
 
 				_L_RETURN_ERR;
 			}
@@ -129,87 +132,26 @@ namespace LiongStudio
 
 			void SSD1322::Launch()
 			{
-				SendCommand(SSD1322_SETCOMMANDLOCK); // 0xFD 
-				SendData(0x12); // Unlock OLED driver IC 
-
-				SendCommand(SSD1322_DISPLAYOFF); // 0xAE 
-
-				SendCommand(SSD1322_SETCLOCKDIVIDER); // 0xB3 
-				SendData(0x91); // 0xB3 
-
-				SendCommand(SSD1322_SETMUXRATIO); // 0xCA 
-				SendData(0x3F); // duty = 1/64 
-
-				SendCommand(SSD1322_SETDISPLAYOFFSET); // 0xA2 
-				SendData(0x00);
-
-				SendCommand(SSD1322_SETSTARTLINE); // 0xA1 
-				SendData(0x00);
-
-				SendCommand(SSD1322_SETREMAP); // 0xA0 
-				SendData(0x14); // Horizontal address increment, Disable Column Address Re-map, Enable Nibble Re-map, Scan from COM[N-1] to COM0, Disable COM Split Odd Even 
-				SendData(0x11); // Enable Dual COM mode 
-
-				SendCommand(SSD1322_SETGPIO); // 0xB5 
-				SendData(0x00); // Disable GPIO Pins Input 
-
-				SendCommand(SSD1322_FUNCTIONSEL); // 0xAB 
-				SendData(0x01); // selection external vdd 
-
-				SendCommand(SSD1322_DISPLAYENHANCE); // 0xB4 
-				SendData(0xA0); // enables the external VSL 
-				SendData(0xF8); // 0xfFD,Enhanced low GS display quality; default is 0xb5(normal), 
-
-				SendCommand(SSD1322_SETCONTRASTCURRENT); // 0xC1 
-				SendData(0xEF); // 0xFF - default is 0x7f 
-
-				SendCommand(SSD1322_MASTERCURRENTCONTROL); // 0xC7 
-				SendData(0x0F); // default is 0x0F 
-
-				// Set grayscale 
-				// SendCommand(SSD1322_SELECTDEFAULTGRAYSCALE); // 0xB9 
-				SendCommand(SSD1322_SETGRAYSCALETABLE); // Set Gray Scale Table 
-				SendData(0x0C);
-				SendData(0x18);
-				SendData(0x24);
-				SendData(0x30);
-				SendData(0x3C);
-				SendData(0x48);
-				SendData(0x54);
-				SendData(0x60);
-				SendData(0x6C);
-				SendData(0x78);
-				SendData(0x84);
-				SendData(0x90);
-				SendData(0x9C);
-				SendData(0xA8);
-				SendData(0xB4);
- 				SendCommand(SSD1322_ENABLEGRAYSCALETABLE);
-
-				SendCommand(SSD1322_SETPHASELENGTH); // 0xB1 
-				SendData(0xE2); // default is 0x74 
-
-				SendCommand(SSD1322_DISPLAYENHANCEB);// 0xD1 
-				SendData(0xA2); // Reserved; default is 0xa2(normal) 
-				SendData(0x20); // 
-
-				SendCommand(SSD1322_SETPRECHARGEVOLTAGE); // 0xBB 
-				SendData(0x1F);// 0.6xVcc 
-
-				SendCommand(SSD1322_SETSECONDPRECHARGEPERIOD); // 0xB6 
-				SendData(0x08); // default 
-
-				SendCommand(SSD1322_SETVCOMH); // 0xBE 
-				SendData(0x07); // 0.86xVcc; default is 0x04 
-
-				SendCommand(SSD1322_NORMALDISPLAY); // 0xA6 
-
-				SendCommand(SSD1322_EXITPARTIALDISPLAY); // 0xA9
-				
+				SendCommand(SSD1322_DISPLAYOFF);
+				// Front clock is devided by 2, oscilator frequancy is 1001b.
+				SendCommand(SSD1322_SETCLOCKDIVIDER); SendData(0x91);
+				// SendCommand(SSD1322_SETMUXRATIO); SendData(0x3F); // Duty = 1/64.
+				// Disable GPIO Pins Input.
+				SendCommand(SSD1322_SETGPIO); SendData(0x00);
+				// Enables the external VSL, enhance low GS display quality.
+				SendCommand(SSD1322_DISPLAYENHANCE); SendData(0xA0); SendData(0xFD);
+				SendCommand(SSD1322_MASTERCURRENTCONTROL); SendData((unsigned char)(_Brightness * 255.0));
+				SendCommand(SSD1322_SETPHASELENGTH); SendData(0xE2);
+				// Precharge voltage: 0.6 x Vcc.
+				SendCommand(SSD1322_SETPRECHARGEVOLTAGE); SendData(0x1F);
+				SendCommand(SSD1322_SETSECONDPRECHARGEPERIOD); SendData(0x08);
+				// High voltage level of common pins: 0.86 x Vcc.
+				SendCommand(SSD1322_SETVCOMH); SendData(0x07);
+				SendCommand(SSD1322_NORMALDISPLAY);
+				SendCommand(SSD1322_EXITPARTIALDISPLAY);
 				// Clear down image ram before opening display 
 				FillScreen(0x00);
-
-				SendCommand(SSD1322_DISPLAYON); // 0xAF 
+				SendCommand(SSD1322_DISPLAYON);
 			}
 
 			void SSD1322::BeginDrawing(int left, int top, int right, int bottom)

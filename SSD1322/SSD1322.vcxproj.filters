@@ -15,21 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\RespiIO.hpp">
+    <ClInclude Include="Include\SSD1322.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Include\SSD1322.hpp">
+    <ClInclude Include="Include\RaspiIO.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\RespiIO.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Source\SSD1322.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Source\Entrance.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RaspiIO.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

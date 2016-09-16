@@ -38,6 +38,18 @@ namespace LiongStudio
 			Spi(Spi&& instance);
 			~Spi();
 
+			/*
+			 * Method:
+			 *   Send data to device.
+			 * Params:
+			 *   $output: Buffer of data to be transmitted.
+			 *   $input: Buffer of data to be received.
+			 *   $length: The length of $output and $input.
+			 * Return: Error code of iotcl(~).
+			 * Note:
+			 *   The length of these two buffer must be the same.
+			 *   $input can be the same buffer as $output.
+			 */
 			int Transmit(unsigned char* output, unsigned char* input, size_t length);
 
 			static void SetPinMode(int pinId, Spi::PinMode mode);

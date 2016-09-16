@@ -118,12 +118,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Include\RespiIO.hpp" />
+    <ClInclude Include="Include\RaspiIO.hpp" />
     <ClInclude Include="Include\SSD1322.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Entrance.cpp" />
-    <ClCompile Include="Source\RespiIO.cpp" />
+    <ClCompile Include="Source\RaspiIO.cpp" />
     <ClCompile Include="Source\SSD1322.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
