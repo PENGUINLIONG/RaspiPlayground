@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 namespace LiongStudio
 {
@@ -8,6 +9,15 @@ namespace LiongStudio
 
 		class Spi
 		{
+			friend void swap(Spi& a, Spi& b)
+			{
+				swap(a._Mode, b._Mode);
+				swap(a._BitsPerWord, b._BitsPerWord);
+				swap(a._Delay, b._Delay);
+
+				swap(a._MaxClock, b._MaxClock);
+				swap(a._FileDevice, b._FileDevice);
+			}
 		private:
 			const int _MosiPinId = 19, _ClockPinId = 23;
 
@@ -21,6 +31,7 @@ namespace LiongStudio
 
 			Spi(int deviceId, int maxClock);
 			Spi(const Spi& instance) = delete;
+			Spi(Spi&& instance);
 			~Spi();
 
 			/*

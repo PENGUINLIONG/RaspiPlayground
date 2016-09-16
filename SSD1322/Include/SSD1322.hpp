@@ -54,6 +54,7 @@ namespace LiongStudio
 				int ResetPinId = 0;
 				int DcPinId = 0;
 				int CsPinId = 0;
+				int MaxClock = 0;
 			};
 
 			class SSD1322
